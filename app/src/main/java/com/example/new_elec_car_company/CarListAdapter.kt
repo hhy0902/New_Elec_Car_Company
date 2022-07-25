@@ -20,8 +20,10 @@ class CarListAdapter(val buttonClicked : (Data) -> Unit ) : ListAdapter<Data, Ca
             fun bind(data: Data) {
                 val address = itemView.findViewById<TextView>(R.id.addressTextView)
                 val searchButton = itemView.findViewById<Button>(R.id.searchButton)
+                val name = itemView.findViewById<TextView>(R.id.nameTextView)
 
                 address.text = data.addr
+                name.text = data.csNm
 
                 searchButton.setOnClickListener {
                     buttonClicked(data)

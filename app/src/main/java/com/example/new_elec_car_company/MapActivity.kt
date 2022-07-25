@@ -8,6 +8,8 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity.START
+import android.view.Gravity.TOP
 import android.view.LayoutInflater
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
@@ -25,8 +27,10 @@ import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.*
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.Overlay
+import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.PathOverlay
 import com.naver.maps.map.util.FusedLocationSource
+import com.naver.maps.map.widget.LocationButtonView
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -49,6 +53,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, Overlay.OnClickList
         findViewById(R.id.houseViewPager)
     }
 
+    private val currentLocationButton : LocationButtonView by lazy {
+        findViewById(R.id.currentLocationButton)
+    }
+
     private lateinit var viewPagerAdapter : CarListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +66,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, Overlay.OnClickList
         locationSource = FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         requestPermission()
-
 
         val tqee= "https://api.odcloud.kr/api/EvInfoServiceV2/v1/getEvSearchList?page=1&perPage=1000000&cond%5Baddr%3A%3ALIKE%5D=&serviceKey=JCrJa4%2F4eF07FKbnkSi7BDDUvnJXCE1CTiyt%2FfnxJ%2B7jewHaXTp5hrKQzOKdWYctQB%2B3a%2FHLuUHkTPq4hqrxvA%3D%3D"
 
@@ -70,7 +77,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, Overlay.OnClickList
 
         mapFragment.getMapAsync(this)
 
-
     }
 
     override fun onMapReady(naverMap: NaverMap) {
@@ -80,7 +86,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, Overlay.OnClickList
         naverMap.mapType = NaverMap.MapType.Navi
 
         val uiSettings = naverMap.uiSettings
-        uiSettings.isLocationButtonEnabled = true
+        uiSettings.isLocationButtonEnabled = false
+        uiSettings.logoGravity = START
+        uiSettings.logoGravity = TOP
+        uiSettings.setLogoMargin(20,20,0,0)
+
+        currentLocationButton.map = naverMap
 
         naverMap.locationSource = locationSource
         naverMap.locationTrackingMode = LocationTrackingMode.Follow
@@ -125,14 +136,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, Overlay.OnClickList
                                     val route = loadMap?.route?.traoptimal
                                     val navigation = loadMap?.route?.traoptimal?.firstOrNull()?.guide
 
-                                    val naviText = findViewById<TextView>(R.id.navigationTextView)
+//                                    val naviText = findViewById<TextView>(R.id.navigationTextView)
 
-                                    navigation?.forEach {
-                                        Log.d("navigation", "${it.instructions}")
-                                        naviText.append(it.instructions)
-                                        naviText.append("\n")
-                                        //naviText.text = ""+ "${it.instructions}"
-                                    }
+//                                    navigation?.forEach {
+//                                        Log.d("navigation", "${it.instructions}")
+//                                        naviText.append(it.instructions)
+//                                        naviText.append("\n")
+//                                        //naviText.text = ""+ "${it.instructions}"
+//                                    }
 
                                     val pathLocation = route?.get(0)?.path
                                     pathLocation?.forEach {
@@ -158,8 +169,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, Overlay.OnClickList
                     item?.data?.forEach {
                         val marker = Marker()
                         marker.position = LatLng(it.lat!!.toDouble(), it.longi!!.toDouble())
-                        marker.icon = Marker.DEFAULT_ICON
+                        //marker.icon = Marker.DEFAULT_ICON
+                        marker.icon = OverlayImage.fromResource(R.drawable.ic_baseline_ev_station_24)
                         marker.tag = it.cpId
+                        marker.width = 90
+                        marker.height = 90
                         marker.map = naverMap
                         //Log.d(" item lat / long", "${it.lat} ${it.longi}")
                         marker.onClickListener = this@MapActivity
@@ -171,7 +185,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback, Overlay.OnClickList
 
                     findViewById<ProgressBar>(R.id.progressBar).visibility = INVISIBLE
                     findViewById<FrameLayout>(R.id.mapLayout).visibility = VISIBLE
-
 
                 }
             }
