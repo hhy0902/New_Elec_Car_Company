@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.new_elec_car_company.model.Data
 import com.example.new_elec_car_company.model.Item
+import org.w3c.dom.Text
 
 
 class CarListAdapter(val buttonClicked : (Data) -> Unit ) : ListAdapter<Data, CarListAdapter.ItemViewHolder>(differ) {
@@ -20,10 +21,38 @@ class CarListAdapter(val buttonClicked : (Data) -> Unit ) : ListAdapter<Data, Ca
             fun bind(data: Data) {
                 val address = itemView.findViewById<TextView>(R.id.addressTextView)
                 val searchButton = itemView.findViewById<Button>(R.id.searchButton)
-                val name = itemView.findViewById<TextView>(R.id.nameTextView)
+                //val name = itemView.findViewById<TextView>(R.id.nameTextView)
+                val chargeTP = itemView.findViewById<TextView>(R.id.ChargeTP)
+                val cpTp = itemView.findViewById<TextView>(R.id.cpTp)
+                val cpStat = itemView.findViewById<TextView>(R.id.cpStat)
 
-                address.text = data.addr
-                name.text = data.csNm
+                address.text = data.addr + " / " + data.csNm
+                //name.text = data.csNm
+
+                when(data.cpStat) {
+                    "1" -> {cpStat.text = "충전기 상태 : 충전가능"}
+                    "2" -> {cpStat.text = "충전기 상태 : 충전중"}
+                    "3" -> {cpStat.text = "충전기 상태 : 고장/점검"}
+                    "4" -> {cpStat.text = "충전기 상태 : 통신장애"}
+                    "5" -> {cpStat.text = "충전기 상태 : 통신미연결"}
+                }
+                when(data.chargeTp) {
+                    "1" -> {chargeTP.text = "충전기타입 : 완속"}
+                    "2" -> {chargeTP.text = "충전기타입 : 급속"}
+                }
+                when(data.cpTp) {
+                    "1" -> {cpTp.text = "충전방식 : B타입(5핀)"}
+                    "2" -> {cpTp.text = "충전방식 : C타입(5핀)"}
+                    "3" -> {cpTp.text = "충전방식 : BC타입(5핀)"}
+                    "4" -> {cpTp.text = "충전방식 : BC타입(7핀)"}
+                    "5" -> {cpTp.text = "충전방식 : DC차 데모"}
+                    "6" -> {cpTp.text = "충전방식 : AC 3상"}
+                    "7" -> {cpTp.text = "충전방식 : DC콤보"}
+                    "8" -> {cpTp.text = "충전방식 : DC차데모+DC콤보"}
+                    "9" -> {cpTp.text = "충전방식 : DC차데모+AC3상"}
+                    "10" -> {cpTp.text = "충전방식 : DC차데모+DC콤보, AC3상"}
+                }
+
 
                 searchButton.setOnClickListener {
                     buttonClicked(data)
